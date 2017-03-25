@@ -12,12 +12,15 @@ $(function() {
             
             // get values from FORM
             var uuid = document.getElementById('uuidResult').innerHTML;
+            var directory = $("input#directory").val();
+            directory = directory.replace(/\s/g, '');
+            directory = directory.toLowerCase();
             var email = $("input#email").val();
             var password = $("input#adminpwd").val();
             var hostname = "daspanel.site";
             var userid = "1000";
 
-            create_zip(uuid, email, password, hostname, userid);
+            create_zip(uuid, directory, email, password, hostname, userid);
         },
         filter: function() {
             return $(this).is(":visible");
@@ -35,7 +38,7 @@ $('#name').focus(function() {
     $('#success').html('');
 });
 
-function create_zip(uuid, email, password, hostname, userid) {
+function create_zip(uuid, directory, email, password, hostname, userid) {
 
     // loading a file and add it in a zip file
     JSZipUtils.getBinaryContent("https://raw.githubusercontent.com/daspanel/daspanel/master/docker-compose.yml", function (err, data) {
@@ -43,9 +46,9 @@ function create_zip(uuid, email, password, hostname, userid) {
             throw err; // or handle the error
         }
         var zip = new JSZip();
-        zip.file(uuid + "/docker-compose.yml", data, {binary:true});
-        zip.file(uuid + "/data/.keep", "");
-        zip.file(uuid + "/daspanel.env", 
+        zip.file(directory + "/docker-compose.yml", data, {binary:true});
+        zip.file(directory + "/data/.keep", "");
+        zip.file(directory + "/daspanel.env", 
             "DASPANEL_SYS_UUID=" + uuid + "\n" +
             "DASPANEL_SYS_ADMIN=" + email + "\n" +
             "DASPANEL_SYS_PASSWORD=" + password + "\n" +
@@ -53,7 +56,7 @@ function create_zip(uuid, email, password, hostname, userid) {
             "DASPANEL_SYS_USERID=" + userid + "\n"
         );
         zip.generateAsync({type:"blob"}).then(function (blob) {
-            saveAs(blob, "daspanel-" + uuid + ".zip");
+            saveAs(blob, "daspanel-" + directory + ".zip");
         });
     });
 }
